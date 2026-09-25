@@ -74,6 +74,14 @@ If you're having an issue with crashing, you can also change the API manually in
 - `1` = OpenGL
 - `2` = Metal (default on macOS)
 
+### CRT Filter
+`Settings > Graphics > CRT Filter` shows the game the way a CRT television drew it: scanlines, a soft
+analog beam, composite or S-Video signal blending, bloom and CRT gamma, using RetroArch shader presets
+(the `crt-guest-advanced` family, CRT Royale, Lottes, Geom and others). On the Switch the shaders are
+built into the NRO and run on the OpenGL renderer; on Windows they run on DirectX 11 (with HDR output)
+or OpenGL. See [docs/CRT_FILTER.md](docs/CRT_FILTER.md) for the presets, the settings and the build
+details.
+
 # Custom Assets
 
 Custom assets are packed in `.o2r` or `.otr` files. To use custom assets, place them in the `mods` folder.

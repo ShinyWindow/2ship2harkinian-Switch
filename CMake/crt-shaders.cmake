@@ -77,28 +77,29 @@ function(crt_shaders_setup target)
     endif()
     message(STATUS "CRT filter: shaders from ${source}")
 
-    set(stage ${CMAKE_COMMAND} -DSRC=${source} -DMANIFEST=${CRT_SHADER_MANIFEST} -DPRESET_DIR=${CRT_PRESET_DIR})
+    set(stage ${CMAKE_COMMAND} "-DSRC=${source}" "-DMANIFEST=${CRT_SHADER_MANIFEST}" "-DPRESET_DIR=${CRT_PRESET_DIR}")
     if(CMAKE_SYSTEM_NAME MATCHES "NintendoSwitch")
         set(romfs "${CMAKE_BINARY_DIR}/romfs")
         file(MAKE_DIRECTORY "${romfs}/shaders")
         add_custom_target(CrtShadersRomfs
-            COMMAND ${stage} -DDEST=${romfs}/shaders -P ${CRT_STAGE_SCRIPT}
-            COMMENT "Staging CRT filter shaders into the romfs")
+            COMMAND ${stage} "-DDEST=${romfs}/shaders" -P "${CRT_STAGE_SCRIPT}"
+            COMMENT "Staging CRT filter shaders into the romfs" VERBATIM)
         add_dependencies(${target} CrtShadersRomfs)
         set(CRT_ROMFS_DIR "${romfs}" PARENT_SCOPE)
         return()
     endif()
 
-    set(commands COMMAND ${stage} -DDEST=$<TARGET_FILE_DIR:${target}>/shaders -P ${CRT_STAGE_SCRIPT})
+    set(commands COMMAND ${stage} "-DDEST=$<TARGET_FILE_DIR:${target}>/shaders" -P "${CRT_STAGE_SCRIPT}")
     if(WIN32 AND EXISTS "${CRT_DEPS_DIR}/librashader/librashader.dll")
         list(APPEND commands COMMAND ${CMAKE_COMMAND} -E copy_if_different
              "${CRT_DEPS_DIR}/librashader/librashader.dll" $<TARGET_FILE_DIR:${target}>)
     endif()
-    add_custom_command(TARGET ${target} POST_BUILD ${commands} COMMENT "Staging CRT filter shaders...")
+    add_custom_command(TARGET ${target} POST_BUILD ${commands} COMMENT "Staging CRT filter shaders..." VERBATIM)
 
     if(NOT CMAKE_SYSTEM_NAME MATCHES "Darwin")
         # The staged folder goes out with the packaged game as well
-        install(CODE "execute_process(COMMAND ${stage} -DDEST=\${CMAKE_INSTALL_PREFIX}/shaders -P ${CRT_STAGE_SCRIPT})"
+        install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" \"-DSRC=${source}\" \"-DMANIFEST=${CRT_SHADER_MANIFEST}\"
+                    \"-DPRESET_DIR=${CRT_PRESET_DIR}\" \"-DDEST=\${CMAKE_INSTALL_PREFIX}/shaders\" -P \"${CRT_STAGE_SCRIPT}\")"
                 COMPONENT 2s2h)
     endif()
 endfunction()
