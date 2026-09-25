@@ -959,7 +959,9 @@ ArchiveVersion DetectArchiveVersion(std::string fileName, bool isO2rType) {
 }
 
 extern "C" void Messagebox_ShowErrorBox(char* title, char* body) {
+#if not defined(__SWITCH__) && not defined(__WIIU__)
     Extractor::ShowErrorBox(title, body);
+#endif
 }
 
 bool VerifyArchiveVersion(ArchiveVersion version) {
@@ -2330,12 +2332,6 @@ extern "C" int Controller_ShouldRumble(size_t slot) {
     // rumble
     return 1;
 }
-
-#if not defined (__SWITCH__) && not defined(__WIIU__)
-extern "C" void Messagebox_ShowErrorBox(char* title, char* body) {
-    Extractor::ShowErrorBox(title, body);
-}
-#endif
 
 // Helper to redirect the user to the boot screen in place of known console crash scenarios, and emits a notification
 extern "C" bool Ship_HandleConsoleCrashAsReset() {
