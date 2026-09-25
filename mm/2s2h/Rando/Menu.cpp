@@ -57,6 +57,18 @@ std::unordered_map<int32_t, const char*> dungeonItemPlacementOptions = {
     { RO_DUNGEON_ITEM_VANILLA, "Vanilla" },
 };
 
+std::unordered_map<int32_t, const char*> remainsShuffleOptions = {
+    { RO_REMAINS_SHUFFLE_ANYWHERE, "Anywhere" },
+    { RO_REMAINS_SHUFFLE_OWN_DUNGEON, "Own Dungeon" },
+    { RO_REMAINS_SHUFFLE_VANILLA, "Vanilla" },
+};
+
+std::unordered_map<int32_t, const char*> songShuffleOptions = {
+    { RO_SONG_SHUFFLE_ANYWHERE, "Anywhere" },
+    { RO_SONG_SHUFFLE_SONG_LOCATIONS, "Song Locations" },
+    { RO_SONG_SHUFFLE_VANILLA, "Vanilla" },
+};
+
 // clang-format off
 std::vector<int32_t> incompatibleWithVanilla = {
     RO_SHUFFLE_BOSS_SOULS,
@@ -316,7 +328,7 @@ static uint32_t checkPoolGeneration = 0;
 void RefreshMetrics() {
     setOfItemsInPool.clear();
     setOfChecksInPool.clear();
-    RandoSaveInfo randoSaveInfo;
+    RandoSaveInfo randoSaveInfo{};
     std::vector<RandoCheckId> checkPool;
     std::vector<RandoItemId> itemPool;
 
@@ -409,6 +421,7 @@ static RegisterShipInitFunc refreshMetricsInit(RefreshMetrics, {
                                                                    "gRando.Options.RO_SHUFFLE_SHOPS",
                                                                    "gRando.Options.RO_SHUFFLE_SKELETON_KEY",
                                                                    "gRando.Options.RO_SHUFFLE_SNOWBALL_DROPS",
+                                                                   "gRando.Options.RO_SHUFFLE_SONGS",
                                                                    "gRando.Options.RO_SHUFFLE_SONG_DOUBLE_TIME",
                                                                    "gRando.Options.RO_SHUFFLE_SONG_INVERTED_TIME",
                                                                    "gRando.Options.RO_SHUFFLE_SONG_SARIA",
@@ -609,11 +622,6 @@ static void DrawGeneralTab() {
         UIWidgets::CheckboxOptions().Tooltip("This will make the contents of a container match the container itself. "
                                              "Eg chests, pots, crates, grass, etc."));
 
-    UIWidgets::CVarCheckbox(
-        "Unique Key Models", "gRando.UniqueKeyModels",
-        UIWidgets::CheckboxOptions().DefaultValue(true).Tooltip(
-            "This will make Small Keys and Boss Keys have unique models depending on their corresponding dungeon."));
-
     UIWidgets::CVarCombobox(
         "Junk Items", "gRando.JunkItems", &junkItemsOptions,
         UIWidgets::ComboboxOptions()
@@ -716,11 +724,39 @@ static void DrawCheckPoolTab() {
 
     UIWidgets::BeginCard("checkPoolWorld");
     ImGui::SeparatorText("World & NPCs");
-    CVarCheckbox("Songs", "gPlaceholderBool",
-                 CheckboxOptions({ { .disabled = true,
-                                     .disabledTooltip = "Songs are currently always shuffled. The option to "
-                                                        "disable this is coming soon." } })
-                     .DefaultValue(true));
+    UIWidgets::CVarCombobox(
+        "Songs", Rando::StaticData::Options[RO_SHUFFLE_SONGS].cvar, &songShuffleOptions,
+        UIWidgets::ComboboxOptions()
+            .ComponentAlignment(UIWidgets::ComponentAlignment::Right)
+            .LabelPosition(UIWidgets::LabelPosition::Near)
+            .Tooltip("Where the songs taught in the world may be found. Extra songs have no location of their own, "
+                     "so they are always shuffled into the item pool like any other item.\n\n"
+                     "Anywhere - Song locations are checks, and their songs can be found anywhere in the world.\n\n"
+                     "Song Locations - Song locations are checks, and their songs are shuffled among them.\n\n"
+                     "Vanilla - Every song stays where it is, and song locations are not checks."));
+    if (CVarGetInteger(Rando::StaticData::Options[RO_SHUFFLE_SONGS].cvar, RO_SONG_SHUFFLE_ANYWHERE) !=
+        RO_SONG_SHUFFLE_VANILLA) {
+        auto& counts = GetCheckCountsByType();
+        auto it = counts.find(RCTYPE_SONG);
+        PoolCountSuffix(it != counts.end() ? it->second : 0);
+    }
+    UIWidgets::CVarCombobox(
+        "Boss Remains", Rando::StaticData::Options[RO_SHUFFLE_BOSS_REMAINS].cvar, &remainsShuffleOptions,
+        UIWidgets::ComboboxOptions()
+            .ComponentAlignment(UIWidgets::ComponentAlignment::Right)
+            .LabelPosition(UIWidgets::LabelPosition::Near)
+            .Tooltip("Where each temple boss's remains may be found.\n\n"
+                     "Anywhere - Defeating a boss rewards a shuffled item, and its remains can be found anywhere in "
+                     "the world.\n\n"
+                     "Own Dungeon - Defeating a boss rewards a shuffled item, and each boss's remains are somewhere "
+                     "inside that boss's own temple.\n\n"
+                     "Vanilla - Every boss still rewards its own remains, and the boss warps are not checks."));
+    if (CVarGetInteger(Rando::StaticData::Options[RO_SHUFFLE_BOSS_REMAINS].cvar, RO_REMAINS_SHUFFLE_VANILLA) !=
+        RO_REMAINS_SHUFFLE_VANILLA) {
+        auto& counts = GetCheckCountsByType();
+        auto it = counts.find(RCTYPE_REMAINS);
+        PoolCountSuffix(it != counts.end() ? it->second : 0);
+    }
     CheckPoolCheckbox("Owl Statues", RO_SHUFFLE_OWL_STATUES, RCTYPE_OWL,
                       "Activating an owl statue is a check. Song of Soaring destinations are unaffected.");
     CheckPoolCheckbox("Shops", RO_SHUFFLE_SHOPS, RCTYPE_SHOP,
@@ -728,8 +764,6 @@ static void DrawCheckPoolTab() {
                       "and the Bomb Shop's bomb bags are always shuffled, even with this off.");
     CheckPoolCheckbox("Tingle Maps", RO_SHUFFLE_TINGLE_SHOPS, RCTYPE_TINGLE_SHOP,
                       "Maps sold by Tingle are checks, with randomized prices.");
-    CheckPoolCheckbox("Boss Remains", RO_SHUFFLE_BOSS_REMAINS, RCTYPE_REMAINS,
-                      "Defeating each temple boss rewards a shuffled item instead of that boss's remains.");
     CheckPoolCheckbox("Cows", RO_SHUFFLE_COWS, RCTYPE_COW, "Playing Epona's Song to a cow is a check.");
     UIWidgets::EndCard();
 
