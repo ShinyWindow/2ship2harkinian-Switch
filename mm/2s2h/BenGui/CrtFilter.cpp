@@ -61,11 +61,11 @@ std::vector<const char*> crtPresetLabels;
 
 const std::vector<int32_t> crtLineCounts = { 240, 288, 360, 480, 540, 720 };
 std::vector<const char*> crtLineOptions = {
-    "240 lines (N64 native) - 6x at 1440p, 9x at 4K",
+    "240 lines (N64 native) - 3x at 720p, 4x at 1080p, 6x at 1440p, 9x at 4K",
     "288 lines - 5x at 1440p",
-    "360 lines - 4x at 1440p, 6x at 4K",
+    "360 lines - 2x at 720p, 3x at 1080p, 4x at 1440p, 6x at 4K",
     "480 lines - 3x at 1440p",
-    "540 lines - 4x at 4K",
+    "540 lines - 2x at 1080p, 4x at 4K",
     "720 lines - 3x at 4K",
 };
 std::vector<const char*> crtAspectOptions = { "4:3 (authentic)", "16:9", "Match window" };
@@ -204,8 +204,17 @@ void RegisterCrtFilterWidgets() {
             "While enabled the game renders at the line count of the simulated TV, overriding the internal "
             "resolution, advanced resolution and N64 mode settings. They apply again when the filter is turned "
             "off.\n\n"
-            "Anti-aliasing (MSAA) is still applied and is recommended, the N64 anti-aliased its image as well.\n\n"
-            "Requires the DirectX 11 renderer, librashader.dll and the shaders folder next to the executable."));
+            "Anti-aliasing (MSAA) is still applied and is recommended, the N64 anti-aliased its image as well."
+#if defined(__SWITCH__)
+            "\n\nThe shaders are built into the game. The heavier presets (CRT Royale, Guest Advanced NTSC) may not "
+            "hold 60 FPS docked; Guest Advanced Fast and the 2Ship presets at 240 lines are the lightest."
+#elif defined(_WIN32)
+            "\n\nWorks with the OpenGL renderer, and with DirectX 11 when librashader.dll sits next to the "
+            "executable. The shaders folder must be next to the executable."
+#else
+            "\n\nWorks with the OpenGL renderer. The shaders folder must be next to the executable."
+#endif
+            ));
     mBenMenu->AddWidget(path, "Shader Preset", WIDGET_CVAR_COMBOBOX)
         .CVar(CVAR_CRT_FILTER("PresetIndex"))
         .Callback([](WidgetInfo& info) { ApplySelectedPreset(); })
@@ -228,6 +237,8 @@ void RegisterCrtFilterWidgets() {
         .Options(CheckboxOptions().DefaultValue(true).Tooltip(
             "Displays the image at a whole multiple of its line count so every scanline is equally thick. On a "
             "1440p display 240 lines scale by exactly 6."));
+#ifdef _WIN32
+    // HDR output is a DXGI swap chain feature, only the Windows build has it
     mBenMenu->AddWidget(path, "HDR Output", WIDGET_SEPARATOR_TEXT);
     mBenMenu->AddWidget(path, "Enable HDR Output", WIDGET_CVAR_CHECKBOX)
         .CVar(CVAR_CRT_FILTER("Hdr.Enabled"))
@@ -258,6 +269,7 @@ void RegisterCrtFilterWidgets() {
             ImGui::PopStyleColor();
         }
     });
+#endif
     mBenMenu->AddWidget(path, "CrtFilterCustom", WIDGET_CUSTOM).CustomFunction([](WidgetInfo& info) {
         auto interpreter = crtInterpreter.lock();
         if (!interpreter) {
