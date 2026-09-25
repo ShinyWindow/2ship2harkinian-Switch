@@ -90,3 +90,4 @@ root and list the files relative to it.
 | Image is black with the filter on | A pass produced no output. Check the log for *framebuffer is incomplete* (the driver lacks a float or sRGB colour format). |
 | Scanlines uneven | Turn *Integer Scaling* on, and pick a line count that divides the screen height. |
 | Too slow | Use *Guest Advanced Fast* or the 2Ship presets at 240 lines, or lower the line count. |
+| Crash while the filter is on (OpenGL) | Start the game with the environment variable `SLANG_TRACE=1`; the log then records every step of every pass, and the last line before the crash names the pass and the step. |
