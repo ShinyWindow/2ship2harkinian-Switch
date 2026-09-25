@@ -295,7 +295,9 @@ void OTRGlobals::RunExtract(int argc, char* argv[]) {
             args.push_back(argv[i]);
         }
     }
-    Extractor extract;
+#if !defined(__SWITCH__) && !defined(__WIIU__)
+    Extractor extract; // consoles ship without the extractor, mm.o2r is generated on PC
+#endif
     PromptSteps promptStep = PS_FILE_CHECK;
     bool romsFromSearch = false;
     std::atomic<size_t> extractCount = 0, totalExtract = 0;
@@ -304,21 +306,25 @@ void OTRGlobals::RunExtract(int argc, char* argv[]) {
     std::string dataPath = std::filesystem::absolute(Ship::Context::GetAppDirectoryPath(appShortName)).string();
     std::string file;
 
+#if defined(__SWITCH__) || defined(__WIIU__)
+    // Consoles can't regenerate the archive themselves, only report it when it is really outdated
+    if (shouldRegen) {
 #if defined(__SWITCH__)
-    BenGui::RegisterPopup("Outdated ROM Archives",
-                          "\x1b[2;2HYou've launched 2Ship with an old ROM O2R file."
-                          "\x1b[4;2HPlease regenerate a new ROM O2R and relaunch."
-                          "\x1b[6;2HPress the Home button to exit...",
-                          "OK", "", [&]() { exit(1); });
-#elif defined(__WIIU__)
-    BenGui::RegisterPopup("Outdated ROM Archives",
-                          "You've launched 2Ship with an old a ROM O2R file.\n\n"
-                          "Please generate a ROM O2R and relaunch.\n\n"
-                          "Press and hold the Power button to shutdown...",
-                          "OK", "", [&]() { exit(1); });
-    OSFatal();
+        BenGui::RegisterPopup("Outdated ROM Archives",
+                              "\x1b[2;2HYou've launched 2Ship with an old ROM O2R file."
+                              "\x1b[4;2HPlease regenerate a new ROM O2R and relaunch."
+                              "\x1b[6;2HPress the Home button to exit...",
+                              "OK", "", [&]() { exit(1); });
+#else
+        BenGui::RegisterPopup("Outdated ROM Archives",
+                              "You've launched 2Ship with an old a ROM O2R file.\n\n"
+                              "Please generate a ROM O2R and relaunch.\n\n"
+                              "Press and hold the Power button to shutdown...",
+                              "OK", "", [&]() { exit(1); });
+        OSFatal();
 #endif
-
+    }
+#else
     if (!std::filesystem::exists(installPath + "/assets")) {
         BenGui::RegisterPopup("Extractor assets not found",
                               "No O2R files found. Missing 'assets/' folder needed to generate OTR file.\nPlease "
@@ -336,6 +342,7 @@ void OTRGlobals::RunExtract(int argc, char* argv[]) {
                                   "OK", "", [&]() { exit(1); });
         }
     }
+#endif
 
     std::shared_ptr<BS::thread_pool> threadPool = std::make_shared<BS::thread_pool>(1);
     std::optional<std::future<void>> extractionTask;
@@ -487,6 +494,7 @@ void OTRGlobals::RunExtract(int argc, char* argv[]) {
 #endif
                 break;
             }
+#if !defined(__SWITCH__) && !defined(__WIIU__)
             case ES_EXTRACT: {
                 switch (promptStep) {
                     case PS_FILE_CHECK: {
@@ -538,6 +546,7 @@ void OTRGlobals::RunExtract(int argc, char* argv[]) {
                 }
                 break;
             }
+#endif
             case ES_VERIFY: {
                 if (!std::filesystem::exists(Ship::Context::LocateFileAcrossAppDirs("mm.o2r", appShortName))) {
                     BenGui::RegisterPopup("No ROM Archives",
