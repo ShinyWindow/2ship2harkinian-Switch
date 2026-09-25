@@ -43,6 +43,7 @@ struct CrtPreset {
 const std::vector<CrtPreset> crtPresets = {
     { "2Ship: Composite, soft beam", "shaders/2ship-crt.slangp" },
     { "2Ship: S-Video, clean signal (recommended)", "shaders/2ship-crt-svideo.slangp" },
+    { "2Ship: S-Video, curved screen", "shaders/2ship-crt-svideo-curved.slangp" },
     { "2Ship: RGB monitor, sharpest", "shaders/2ship-crt-rgb.slangp" },
     { "2Ship: Living room TV (curved, Trinitron colours)", "shaders/2ship-crt-tv.slangp" },
     { "2Ship: Light scanlines (brighter in SDR)", "shaders/2ship-crt-light.slangp" },

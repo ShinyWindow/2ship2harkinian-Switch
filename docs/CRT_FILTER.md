@@ -27,6 +27,7 @@ In game: **Settings > Graphics > CRT Filter**.
 |---|---|
 | 2Ship: Composite, soft beam | guest-advanced-ntsc with a wide horizontal beam and sharpening off |
 | 2Ship: S-Video, clean signal (recommended) | the same without composite artifacts |
+| 2Ship: S-Video, curved screen | the S-Video look on a gently curved tube with rounded corners, colours untouched |
 | 2Ship: RGB monitor, sharpest | no signal simulation, broadcast-monitor look |
 | 2Ship: Living room TV | S-Video on a curved tube, Trinitron colours |
 | 2Ship: Light scanlines | wider beams, less of the screen dark, for SDR displays |
