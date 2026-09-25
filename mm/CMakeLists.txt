@@ -668,7 +668,16 @@ else()
     target_link_libraries(${PROJECT_NAME} PRIVATE "${ADDITIONAL_LIBRARY_DEPENDENCIES}")
 endif()
 
+# CRT filter: the RetroArch slang shaders behind Settings > Graphics > CRT Filter are fetched at configure time
+# and staged next to the game, or into the NRO's romfs on the Switch (see CMake/crt-shaders.cmake)
+include(${CMAKE_SOURCE_DIR}/CMake/crt-shaders.cmake)
+crt_shaders_setup(${PROJECT_NAME})
+
 if(CMAKE_SYSTEM_NAME MATCHES "NintendoSwitch")
+
+if(CRT_ROMFS_DIR)
+    set(2SHIP_NRO_ROMFS ROMFS ${CRT_ROMFS_DIR})
+endif()
 
 nx_generate_nacp(2s2h.nacp
    NAME "2Ship 2Harkinian"
@@ -679,6 +688,7 @@ nx_generate_nacp(2s2h.nacp
 nx_create_nro(2ship
     NACP 2s2h.nacp
     ICON ${CMAKE_CURRENT_SOURCE_DIR}/switch/2s2hIcon.png
+    ${2SHIP_NRO_ROMFS}
 )
 
 INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/2s2h.nro DESTINATION . COMPONENT 2s2h)

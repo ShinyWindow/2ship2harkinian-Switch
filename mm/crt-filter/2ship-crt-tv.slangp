@@ -1,0 +1,12 @@
+# Living room TV: the S-Video look on a curved tube with rounded corners and Trinitron phosphor colours.
+#reference "crt/crt-guest-advanced-ntsc.slangp"
+
+SIGMA_HOR = "1.600000"
+S_SHARP = "0.000000"
+HSHARPNESS = "3.000000"
+cust_artifacting = "0.000000"
+cust_fringing = "0.000000"
+warpX = "0.030000"
+warpY = "0.040000"
+csize = "0.020000"
+TNTC = "2.000000"

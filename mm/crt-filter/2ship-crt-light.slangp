@@ -1,0 +1,13 @@
+# Light scanlines: the S-Video look with wider beams, so less of the screen is dark. Meant for SDR, where the
+# brightness lost to the scanline gaps can't be made up for.
+#reference "crt/crt-guest-advanced-ntsc.slangp"
+
+SIGMA_HOR = "1.600000"
+S_SHARP = "0.000000"
+HSHARPNESS = "3.000000"
+cust_artifacting = "0.000000"
+cust_fringing = "0.000000"
+scanline1 = "3.000000"
+scanline2 = "5.000000"
+beam_min = "1.000000"
+brightboost = "1.500000"

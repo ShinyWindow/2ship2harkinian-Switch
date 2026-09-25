@@ -1,0 +1,6 @@
+# RGB monitor: no signal simulation at all, the look of a broadcast monitor. Sharpest option, the scanlines and
+# beam shape are unchanged.
+#reference "crt/crt-guest-advanced.slangp"
+
+h_sharp = "3.000000"
+s_sharp = "0.000000"

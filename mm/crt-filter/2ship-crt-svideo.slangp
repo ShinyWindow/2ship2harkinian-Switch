@@ -1,0 +1,9 @@
+# S-Video: the soft beam of 2ship-crt without the composite artifacts. Luma and chroma travel separately, so there
+# is no dot crawl, checkerboarding or rainbowing, only the limited colour bandwidth.
+#reference "crt/crt-guest-advanced-ntsc.slangp"
+
+SIGMA_HOR = "1.600000"
+S_SHARP = "0.000000"
+HSHARPNESS = "3.000000"
+cust_artifacting = "0.000000"
+cust_fringing = "0.000000"

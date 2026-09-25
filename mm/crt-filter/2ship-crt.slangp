@@ -1,0 +1,7 @@
+# 2 Ship 2 Harkinian CRT look: crt-guest-advanced-ntsc with a soft, TV-like horizontal beam.
+# The stock values are tuned for crisp 2D pixel art; a 3D N64 image through composite video was much softer.
+#reference "crt/crt-guest-advanced-ntsc.slangp"
+
+SIGMA_HOR = "1.600000"
+S_SHARP = "0.000000"
+HSHARPNESS = "3.000000"
